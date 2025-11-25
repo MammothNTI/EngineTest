@@ -68,3 +68,5 @@ db.ref("codes").limitToLast(1).on("value", snapshot => {
     editor.setValue(child.val());
   });
 });
+
+alert("New Update");
