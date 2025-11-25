@@ -31,7 +31,7 @@ function captureConsole() {
     return logs.join("\n");
   };
 }
-
+//change
 // Run code safely
 runBtn.addEventListener("click", () => {
   const code = codeInput.value;
