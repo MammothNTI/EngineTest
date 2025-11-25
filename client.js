@@ -1,4 +1,4 @@
-// Optional: Firebase setup to save/load code
+// Firebase configuration (optional, for saving code)
 const firebaseConfig = {
   apiKey: "AIzaSyD67h7_zcnktMCTZLhr0ZVO3HJjEuxhytU",
   authDomain: "chat-website-2d1bd.firebaseapp.com",
@@ -14,11 +14,18 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 // DOM elements
-const codeInput = document.getElementById("codeInput");
-const runBtn = document.getElementById("runBtn");
 const output = document.getElementById("output");
+const runBtn = document.getElementById("runBtn");
 
-// Safe console wrapper
+// Initialize CodeMirror editor
+const editor = CodeMirror.fromTextArea(document.getElementById("codeInput"), {
+  mode: "javascript",
+  lineNumbers: true,
+  theme: "default",
+  extraKeys: {"Ctrl-Space": "autocomplete"}
+});
+
+// Safe console capture
 function captureConsole() {
   const originalLog = console.log;
   const logs = [];
@@ -31,17 +38,17 @@ function captureConsole() {
     return logs.join("\n");
   };
 }
-//change
-// Run code safely
+
+// Run code
 runBtn.addEventListener("click", () => {
-  const code = codeInput.value;
-  output.textContent = ""; // clear output
+  const code = editor.getValue();
+  output.textContent = "";
 
   const restoreConsole = captureConsole();
 
   try {
     // eslint-disable-next-line no-eval
-    const result = eval(code); // simple JS eval
+    const result = eval(code);
     const logs = restoreConsole();
     output.textContent = (logs ? logs + "\n" : "") + (result !== undefined ? result : "");
   } catch (err) {
@@ -58,6 +65,6 @@ function saveCode(code) {
 // Optional: Load last saved code
 db.ref("codes").limitToLast(1).on("value", snapshot => {
   snapshot.forEach(child => {
-    codeInput.value = child.val();
+    editor.setValue(child.val());
   });
 });

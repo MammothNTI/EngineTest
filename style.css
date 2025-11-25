@@ -40,3 +40,10 @@ pre {
   min-height: 100px;
   overflow-x: auto;
 }
+
+/* CodeMirror styling override */
+.CodeMirror {
+  height: 250px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
