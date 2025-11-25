@@ -1,4 +1,4 @@
-// Firebase configuration
+// Optional: Firebase setup to save/load code
 const firebaseConfig = {
   apiKey: "AIzaSyD67h7_zcnktMCTZLhr0ZVO3HJjEuxhytU",
   authDomain: "chat-website-2d1bd.firebaseapp.com",
@@ -10,47 +10,54 @@ const firebaseConfig = {
   measurementId: "G-6X8PRBMSJY"
 };
 
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 // DOM elements
-const messagesDiv = document.getElementById("messages");
-const messageInput = document.getElementById("messageInput");
-const sendBtn = document.getElementById("sendBtn");
+const codeInput = document.getElementById("codeInput");
+const runBtn = document.getElementById("runBtn");
+const output = document.getElementById("output");
 
-// Sanitize to prevent HTML injection
-function sanitize(text) {
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
+// Safe console wrapper
+function captureConsole() {
+  const originalLog = console.log;
+  const logs = [];
+  console.log = function(...args) {
+    logs.push(args.join(" "));
+    originalLog.apply(console, args);
+  };
+  return () => {
+    console.log = originalLog;
+    return logs.join("\n");
+  };
 }
 
-// Send message
-function sendMessage(text) {
-  db.ref("messages").push(sanitize(text));
-}
+// Run code safely
+runBtn.addEventListener("click", () => {
+  const code = codeInput.value;
+  output.textContent = ""; // clear output
 
-// Button click or Enter key
-sendBtn.addEventListener("click", () => {
-  const msg = messageInput.value.trim();
-  if (msg) {
-    sendMessage(msg);
-    messageInput.value = "";
+  const restoreConsole = captureConsole();
+
+  try {
+    // eslint-disable-next-line no-eval
+    const result = eval(code); // simple JS eval
+    const logs = restoreConsole();
+    output.textContent = (logs ? logs + "\n" : "") + (result !== undefined ? result : "");
+  } catch (err) {
+    restoreConsole();
+    output.textContent = "Error: " + err.message;
   }
 });
 
-messageInput.addEventListener("keypress", e => {
-  if (e.key === "Enter") sendBtn.click();
-});
+// Optional: Save code to Firebase
+function saveCode(code) {
+  db.ref("codes").push(code);
+}
 
-// Listen for new messages
-db.ref("messages").on("value", snapshot => {
-  messagesDiv.innerHTML = "";
+// Optional: Load last saved code
+db.ref("codes").limitToLast(1).on("value", snapshot => {
   snapshot.forEach(child => {
-    const p = document.createElement("p");
-    p.textContent = child.val();
-    messagesDiv.appendChild(p);
+    codeInput.value = child.val();
   });
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
 });

@@ -3,22 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Firebase Chat Demo</title>
+  <title>JS Live Playground</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
-    <h1>Firebase Chat Demo</h1>
-    <div id="messages"></div>
-    <input type="text" id="messageInput" placeholder="Type a message">
-    <button id="sendBtn">Send</button>
+    <h1>JS Live Playground</h1>
+
+    <!-- Code editor -->
+    <textarea id="codeInput" placeholder="Write JavaScript code here..."></textarea>
+    <button id="runBtn">Run</button>
+
+    <!-- Output -->
+    <h2>Output:</h2>
+    <pre id="output"></pre>
   </div>
 
-  <!-- Firebase compat scripts -->
+  <!-- Firebase scripts if you want to save/load code -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-<!---->
-  <!-- Your client script -->
+
+  <!-- Client script -->
   <script src="client.js"></script>
 </body>
 </html>
